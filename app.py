@@ -51,8 +51,34 @@ def delete(student_id: int, session: Session = Depends(get_session())):
     session.commit()
     return {"ok": True}
 
+@app.get("/students/age/min/{min_age}")
+def students_min_age(min_age: int, session: Session = Depends(get_session)):
+    statement = select(Student).where(Student.age >= min_age)
+    return session.exec(statement).all()
+
+
+@app.get("/students/age/max/{max_age}")
+def students_max_age(max_age: int, session: Session = Depends(get_session)):
+    statement = select(Student).where(Student.age <= max_age)
+    return session.exec(statement).all()
+
+
+@app.get("/students/name/{substring}")
+def students_name_contains(substring: str, session: Session = Depends(get_session)):
+    statement = select(Student).where(Student.name.contains(substring))
+    return session.exec(statement).all()
+
+
 @app.get("/students/count")
-def count_students(session: Session = Depends(get_session)):
-    statement = select(Student)
-    total = len(session.exec(statement).all())
-    return {"total_students": total}
+def student_count(session: Session = Depends(get_session)):
+    total = session.exec(select(Student)).all()
+    return {"total_students": len(total)}
+
+
+@app.get("/students/age/average")
+def average_age(session: Session = Depends(get_session)):
+    students = session.exec(select(Student)).all()
+    if not students:
+        return {"average_age": 0}
+    avg = sum(s.age for s in students) / len(students)
+    return {"average_age": round(avg, 2)}
