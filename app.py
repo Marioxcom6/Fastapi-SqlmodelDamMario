@@ -21,17 +21,17 @@ def create_students(student: Student, session: Session = Depends(get_session)):
     return student
 
 @app.get("/students/", response_model=List[Student])
-def get_students(student_id: int, session: Session = Depends(get_session)):
+def get_student(session: Session = Depends(get_session)):
     return session.exec(select(Student)).all()
 
 @app.get("/students/{student_id}", response_model=Student)
-def get_student(student_id: int, session: Session = Depends((get_session))):
+def get_student(student_id: int, session: Session = Depends(get_session)):
     student = session.get(Student, student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Dtudent not found")
     return student
 
-@app.put("students/{student_id}", response_model=Student)
+@app.put("/students/{student_id}", response_model=Student)
 def update_student(student_id: int, updated: Student, session: Session = Depends(get_session)):
     student = session.get(Student, student_id)
     if not student:
@@ -43,7 +43,7 @@ def update_student(student_id: int, updated: Student, session: Session = Depends
     return student
 
 @app.delete("/students/{student_id}")
-def delete(student_id: int, session: Session = Depends(get_session())):
+def delete(student_id: int, session: Session = Depends(get_session)):
     student = session.get(Student, student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
